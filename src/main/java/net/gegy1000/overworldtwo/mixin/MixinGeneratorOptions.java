@@ -2,17 +2,18 @@ package net.gegy1000.overworldtwo.mixin;
 
 import com.google.common.base.MoreObjects;
 
-import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.SimpleRegistry;
+import net.minecraft.world.Dimension;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.GeneratorOptions;
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
+
 
 import net.gegy1000.overworldtwo.generator.OverworldTwoChunkGenerator;
+import net.minecraft.world.biome.provider.OverworldBiomeProvider;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,10 +22,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Properties;
 import java.util.Random;
 
-@Mixin(GeneratorOptions.class)
+@Mixin(DimensionGeneratorSettings.class)
 public class MixinGeneratorOptions {
-    @Inject(method = "fromProperties", at = @At("HEAD"), cancellable = true)
-    private static void injectOverworldTwo(DynamicRegistryManager dynamicRegistryManager, Properties properties, CallbackInfoReturnable<GeneratorOptions> cir) {
+    @Inject(method = "func_242753_a", at = @At("HEAD"), cancellable = true)
+    private static void injectOverworldTwo(DynamicRegistries dynamicRegistryManager, Properties properties, CallbackInfoReturnable<DimensionGeneratorSettings> cir) {
         // no server.properties file generated
         if (properties.get("level-type") == null) {
             return;
@@ -47,16 +48,16 @@ public class MixinGeneratorOptions {
             }
 
             // get other misc data
-            Registry<DimensionType> dimensions = dynamicRegistryManager.get(Registry.DIMENSION_TYPE_KEY);
-            Registry<Biome> biomes = dynamicRegistryManager.get(Registry.BIOME_KEY);
-            Registry<ChunkGeneratorSettings> chunkgens = dynamicRegistryManager.get(Registry.NOISE_SETTINGS_WORLDGEN);
-            SimpleRegistry<DimensionOptions> dimensionOptions = DimensionType.createDefaultDimensionOptions(dimensions, biomes, chunkgens, seed);
+            Registry<DimensionType> dimensions = dynamicRegistryManager.getRegistry(Registry.DIMENSION_TYPE_KEY);
+            Registry<Biome> biomes = dynamicRegistryManager.getRegistry(Registry.BIOME_KEY);
+            Registry<DimensionSettings> chunkgens = dynamicRegistryManager.getRegistry(Registry.NOISE_SETTINGS_KEY);
+            SimpleRegistry<Dimension> dimensionOptions = DimensionType.getDefaultSimpleRegistry(dimensions, biomes, chunkgens, seed);
 
             String generate_structures = (String)properties.get("generate-structures");
             boolean generateStructures = generate_structures == null || Boolean.parseBoolean(generate_structures);
 
             // return our chunk generator
-            cir.setReturnValue(new GeneratorOptions(seed, generateStructures, false, GeneratorOptions.method_28608(dimensions, dimensionOptions, new OverworldTwoChunkGenerator(new VanillaLayeredBiomeSource(seed, false, false, biomes), seed, OverworldTwoChunkGenerator.OVERWORLD))));
+            cir.setReturnValue(new DimensionGeneratorSettings(seed, generateStructures, false, DimensionGeneratorSettings.func_242749_a(dimensions, dimensionOptions, new OverworldTwoChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, OverworldTwoChunkGenerator.OVERWORLD))));
         }
     }
 }

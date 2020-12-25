@@ -1,13 +1,12 @@
 package net.gegy1000.overworldtwo.util;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.structure.rule.AlwaysTrueRuleTest;
-import net.minecraft.structure.rule.RuleTest;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.feature.template.AlwaysTrueRuleTest;
+import net.minecraft.world.gen.feature.template.RuleTest;
 
 import java.util.Random;
-import java.util.function.Predicate;
 
 public final class BlockBrush {
     public final BlockState block;
@@ -28,7 +27,7 @@ public final class BlockBrush {
         return new BlockBrush(block, replace, 0b10);
     }
 
-    public boolean test(WorldAccess world, Random random, BlockPos pos) {
+    public boolean test(IWorld world, Random random, BlockPos pos) {
         return this.replace.test(world.getBlockState(pos), random);
     }
 }

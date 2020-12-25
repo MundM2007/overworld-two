@@ -1,0 +1,19 @@
+modLoader = "javafml"
+loaderVersion = "[33,)"
+license = "LGPLv3"
+issueTrackerURL = "https://github.com/CorgiTaco/overworld-two/issues"
+[[mods]]
+modId = "overworld_two"
+version = "1.0"
+displayName = "Overworld 2"
+logoFile = "icon.png"
+authors = "gegy1000 & SuperCoder79. Maintained by CorgiTaco"
+description = '''
+A replacement for the vanilla world generator that sacrifices parity for performance.
+'''
+[[dependencies.overworld_two]]
+modId = "forge"
+mandatory = true
+versionRange = "[34,)"
+ordering = "NONE"
+side = "BOTH"

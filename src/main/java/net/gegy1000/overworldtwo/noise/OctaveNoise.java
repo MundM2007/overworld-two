@@ -1,6 +1,6 @@
 package net.gegy1000.overworldtwo.noise;
 
-import net.minecraft.world.biome.source.SeedMixer;
+import net.minecraft.util.FastRandom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +163,7 @@ public final class OctaveNoise implements Noise {
 
             for (int i = 0; i < layers.length; i++) {
                 layers[i] = this.octaves.get(i).create(seed);
-                seed = SeedMixer.mixSeed(seed, i);
+                seed = FastRandom.mix(seed, i);
             }
 
             return layers;

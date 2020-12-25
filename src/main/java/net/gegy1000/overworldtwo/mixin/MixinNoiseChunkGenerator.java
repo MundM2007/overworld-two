@@ -2,19 +2,19 @@ package net.gegy1000.overworldtwo.mixin;
 
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
+
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.structure.JigsawJunction;
-import net.minecraft.structure.PoolStructurePiece;
-import net.minecraft.structure.StructurePiece;
-import net.minecraft.structure.StructureStart;
-import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
+
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.jigsaw.JigsawJunction;
+import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
+import net.minecraft.world.gen.feature.structure.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,41 +29,41 @@ import java.util.Map;
 @Mixin(NoiseChunkGenerator.class)
 public class MixinNoiseChunkGenerator {
     @Redirect(
-            method = "populateNoise",
+            method = "func_230352_b_",
             at = @At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/world/gen/feature/StructureFeature;JIGSAW_STRUCTURES:Ljava/util/List;"
+                    target = "Lnet/minecraft/world/gen/feature/structure/Structure;field_236384_t_:Ljava/util/List;"
             )
     )
-    private List<StructureFeature<?>> disableStructureIterator(WorldAccess world, StructureAccessor structures, Chunk chunk) {
+    private List<Structure<?>> disableStructureIterator(IWorld world, StructureManager structures, IChunk chunk) {
         return Collections.emptyList();
     }
 
     @Inject(
-            method = "populateNoise",
+            method = "func_230352_b_",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/chunk/Chunk;getPos()Lnet/minecraft/util/math/ChunkPos;"
+                    target = "Lnet/minecraft/world/chunk/IChunk;getPos()Lnet/minecraft/util/math/ChunkPos;"
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void collectStructures(
-            WorldAccess world, StructureAccessor structures, Chunk chunk,
+            IWorld world, StructureManager structures, IChunk chunk,
             CallbackInfo ci, ObjectList<StructurePiece> pieces, ObjectList<JigsawJunction> junctions
     ) {
         ChunkPos chunkPos = chunk.getPos();
 
-        int minX = chunkPos.getStartX();
-        int minZ = chunkPos.getStartZ();
-        int maxX = chunkPos.getEndX();
-        int maxZ = chunkPos.getEndZ();
+        int minX = chunkPos.getXStart();
+        int minZ = chunkPos.getZStart();
+        int maxX = chunkPos.getXEnd();
+        int maxZ = chunkPos.getZEnd();
 
-        Map<StructureFeature<?>, LongSet> structureReferences = chunk.getStructureReferences();
+        Map<Structure<?>, LongSet> structureReferences = chunk.getStructureReferences();
         if (structureReferences.isEmpty()) {
             return;
         }
 
-        for (StructureFeature<?> feature : StructureFeature.JIGSAW_STRUCTURES) {
+        for (Structure<?> feature : Structure.field_236384_t_) {
             LongSet references = structureReferences.get(feature);
             if (references == null) continue;
 
@@ -71,25 +71,25 @@ public class MixinNoiseChunkGenerator {
 
             while (referenceIterator.hasNext()) {
                 long packedReference = referenceIterator.nextLong();
-                int referenceX = ChunkPos.getPackedX(packedReference);
-                int referenceZ = ChunkPos.getPackedZ(packedReference);
+                int referenceX = ChunkPos.getX(packedReference);
+                int referenceZ = ChunkPos.getZ(packedReference);
 
-                Chunk referenceChunk = world.getChunk(referenceX, referenceZ, ChunkStatus.STRUCTURE_STARTS);
-                StructureStart<?> start = referenceChunk.getStructureStart(feature);
-                if (start == null || !start.hasChildren()) {
+                IChunk referenceChunk = world.getChunk(referenceX, referenceZ, ChunkStatus.STRUCTURE_STARTS);
+                StructureStart<?> start = referenceChunk.func_230342_a_(feature);
+                if (start == null || !start.isValid()) {
                     continue;
                 }
 
-                for (StructurePiece piece : start.getChildren()) {
+                for (StructurePiece piece : start.getComponents()) {
                     int radius = 12;
-                    if (!piece.intersectsChunk(chunkPos, radius)) {
+                    if (!piece.func_214810_a(chunkPos, radius)) {
                         continue;
                     }
 
-                    if (piece instanceof PoolStructurePiece) {
-                        PoolStructurePiece pooledPiece = (PoolStructurePiece) piece;
-                        StructurePool.Projection projection = pooledPiece.getPoolElement().getProjection();
-                        if (projection == StructurePool.Projection.RIGID) {
+                    if (piece instanceof AbstractVillagePiece) {
+                        AbstractVillagePiece pooledPiece = (AbstractVillagePiece) piece;
+                        JigsawPattern.PlacementBehaviour projection = pooledPiece.getJigsawPiece().getPlacementBehaviour();
+                        if (projection == JigsawPattern.PlacementBehaviour.RIGID) {
                             pieces.add(pooledPiece);
                         }
 

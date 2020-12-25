@@ -5,12 +5,12 @@ import net.gegy1000.overworldtwo.util.BlockCanvas;
 import net.gegy1000.overworldtwo.generator.OverworldTwoChunkGenerator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.StructureWorldAccess;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IServerWorld;
+import net.minecraft.world.IWorld;
+
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.OreFeature;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +27,7 @@ public class MixinOreFeature {
 
     @Inject(method = "generate", at = @At("HEAD"), cancellable = true)
     public void generate(
-            StructureWorldAccess world, ChunkGenerator generator,
+            ISeedReader world, ChunkGenerator generator,
             Random random, BlockPos origin, OreFeatureConfig config,
             CallbackInfoReturnable<Boolean> ci
     ) {
@@ -36,7 +36,7 @@ public class MixinOreFeature {
         }
     }
 
-    private boolean generate(ServerWorldAccess world, Random random, BlockPos origin, OreFeatureConfig config) {
+    private boolean generate(IServerWorld world, Random random, BlockPos origin, OreFeatureConfig config) {
         float theta = random.nextFloat() * PI;
 
         int nodeRadius = MathHelper.ceil((config.size / 16.0F * 2.0F + 1.0F) / 2.0F);
@@ -56,7 +56,7 @@ public class MixinOreFeature {
         int width = 2 * (MathHelper.ceil(radius) + nodeRadius);
         int height = 2 * (2 + nodeRadius);
 
-        int surfaceY = world.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, minX, minZ);
+        int surfaceY = world.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, minX, minZ);
         if (minY <= surfaceY) {
             return this.tryGenerate(world, random, config, x1, x2, z1, z2, y1, y2, minX, minY, minZ, width, height);
         }
@@ -69,7 +69,7 @@ public class MixinOreFeature {
 
         for (int z = minZ; z <= minZ + width; z += 2) {
             for (int x = minX; x <= minX + width; x += 2) {
-                if (minY <= world.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z)) {
+                if (minY <= world.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z)) {
                     return this.tryGenerate(world, random, config, x1, x2, z1, z2, y1, y2, minX, minY, minZ, width, height);
                 }
             }
@@ -79,7 +79,7 @@ public class MixinOreFeature {
     }
 
     protected boolean tryGenerate(
-            WorldAccess world, Random random, OreFeatureConfig config,
+            IWorld world, Random random, OreFeatureConfig config,
             double x1, double x2, double z1,
             double z2, double y1, double y2,
             int minX, int minY, int minZ,

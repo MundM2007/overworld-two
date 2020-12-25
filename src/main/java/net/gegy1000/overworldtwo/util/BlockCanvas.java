@@ -3,17 +3,17 @@ package net.gegy1000.overworldtwo.util;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 
 import java.util.BitSet;
 import java.util.Random;
 
 public final class BlockCanvas implements AutoCloseable {
-    private static final BlockBrush NO_BRUSH = new BlockBrush(Blocks.AIR.getDefaultState(), OreFeatureConfig.Rules.BASE_STONE_OVERWORLD, 0);
+    private static final BlockBrush NO_BRUSH = new BlockBrush(Blocks.AIR.getDefaultState(), OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, 0);
     private static final boolean DEBUG = true;
 
-    private WorldAccess world;
+    private IWorld world;
 
     private final int minX;
     private final int minY;
@@ -28,7 +28,7 @@ public final class BlockCanvas implements AutoCloseable {
 
     private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 
-    public BlockCanvas(WorldAccess world, int minX, int minY, int minZ, int sizeX, int sizeY, int sizeZ, BitSet mask, BlockBrush brush) {
+    public BlockCanvas(IWorld world, int minX, int minY, int minZ, int sizeX, int sizeY, int sizeZ, BitSet mask, BlockBrush brush) {
         this.world = world;
         this.minX = minX;
         this.minY = minY;
@@ -40,7 +40,7 @@ public final class BlockCanvas implements AutoCloseable {
         this.brush = brush;
     }
 
-    public static BlockCanvas open(WorldAccess world, int minX, int minY, int minZ, int sizeX, int sizeY, int sizeZ) {
+    public static BlockCanvas open(IWorld world, int minX, int minY, int minZ, int sizeX, int sizeY, int sizeZ) {
         return new BlockCanvas(world, minX, minY, minZ, sizeX, sizeY, sizeZ, new BitSet(sizeX * sizeY * sizeZ), NO_BRUSH);
     }
 
@@ -102,7 +102,7 @@ public final class BlockCanvas implements AutoCloseable {
     }
 
     private BlockPos pos(int x, int y, int z) {
-        return this.mutable.set(x + this.minX, y + this.minY, z + this.minZ);
+        return this.mutable.setPos(x + this.minX, y + this.minY, z + this.minZ);
     }
 
     private int index(int x, int y, int z) {
