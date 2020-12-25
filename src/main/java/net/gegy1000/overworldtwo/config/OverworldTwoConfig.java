@@ -25,6 +25,9 @@ public final class OverworldTwoConfig {
     @SerializedName("generate_nether")
     public boolean generateNether = true;
 
+    @SerializedName("fast_ores")
+    public boolean fastOres = true;
+
     public static OverworldTwoConfig get() {
         if (config == null) {
             try {

@@ -1,5 +1,6 @@
 package net.gegy1000.overworldtwo.mixin;
 
+import net.gegy1000.overworldtwo.config.OverworldTwoConfig;
 import net.gegy1000.overworldtwo.util.BlockBrush;
 import net.gegy1000.overworldtwo.util.BlockCanvas;
 import net.gegy1000.overworldtwo.generator.OverworldTwoChunkGenerator;
@@ -31,7 +32,7 @@ public class MixinOreFeature {
             Random random, BlockPos origin, OreFeatureConfig config,
             CallbackInfoReturnable<Boolean> ci
     ) {
-        if (generator instanceof OverworldTwoChunkGenerator) {
+        if (generator instanceof OverworldTwoChunkGenerator || OverworldTwoConfig.get().fastOres) {
             ci.setReturnValue(this.generate(world, random, origin, config));
         }
     }
