@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "net.gegy1000.overworldtwo.mixin",
   "compatibilityLevel": "JAVA_8",
+  "refmap": "overworld_two.refmap.json",
   "mixins": [
     "MixinDimensionType",
     "MixinGeneratorOptions",

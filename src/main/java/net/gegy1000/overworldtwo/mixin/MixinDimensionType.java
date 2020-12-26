@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinDimensionType {
 
     @Inject(at = @At("RETURN"), method = "getNetherChunkGenerator(Lnet/minecraft/util/registry/Registry;Lnet/minecraft/util/registry/Registry;J)Lnet/minecraft/world/gen/ChunkGenerator;", cancellable = true)
-    private static void netherDimensionOverworldTwo(Registry<Biome> registry, Registry<DimensionSettings> dimSettings, long seed, CallbackInfoReturnable<ChunkGenerator> cir) {
+    private static void netherDimensionOverworldTwo(Registry<Biome> lookUpRegistryBiome, Registry<DimensionSettings> lookUpRegistryDimensionType, long seed, CallbackInfoReturnable<ChunkGenerator> cir) {
         if (OverworldTwoConfig.get().generateNether)
             cir.setReturnValue(new OverworldTwoChunkGenerator(cir.getReturnValue().getBiomeProvider(), seed, OverworldTwoChunkGenerator.NETHER));
     }
