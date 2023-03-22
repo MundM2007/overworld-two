@@ -15,6 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'org.spongepowered.mixin'
 
 version = "${mod_version}-${mc_version}"
 group = "net.gegy1000.${modid}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -95,6 +96,11 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}" //21
 
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    runtimeOnly fg.deobf("curse.maven:stoneholm-461822:3337788")
+    runtimeOnly fg.deobf("curse.maven:clothconfig-348521:3972422")
+
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
@@ -153,8 +159,8 @@ publishing {
     }
 }
 
-apply plugin: 'org.spongepowered.mixin'
-
-mixin {
-    add sourceSets.main, "${modid}.refmap.json"
+sourceSets {
+    main {
+        ext.refMap = "${modid}.refmap.json"
+    }
 }
