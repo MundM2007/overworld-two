@@ -20,6 +20,7 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 
 import net.minecraft.world.biome.provider.BiomeProvider;
@@ -115,7 +116,7 @@ public class OverworldTwoChunkGenerator extends NoiseChunkGenerator {
     }
 
     private static OverworldTwoGenerationSettings createOverworld() {
-        DimensionStructuresSettings structures = new DimensionStructuresSettings(true);
+        DimensionStructuresSettings structures = WorldGenRegistries.NOISE_SETTINGS.getValueForKey(DimensionSettings.field_242734_c).getStructures();
 
         // Vanilla: 1.0, 1.0, 40.0, 22.0
         ScalingSettings noiseSampler = new ScalingSettings(24.0, 24.0, 40.0, 18.0);
@@ -150,7 +151,7 @@ public class OverworldTwoChunkGenerator extends NoiseChunkGenerator {
     }
 
     private static OverworldTwoGenerationSettings createNether() {
-        DimensionStructuresSettings structures = new DimensionStructuresSettings(false);
+        DimensionStructuresSettings structures = WorldGenRegistries.NOISE_SETTINGS.getValueForKey(DimensionSettings.field_242736_e).getStructures();
         Map<Structure<?>, StructureSeparationSettings> map = Maps.newHashMap(DimensionStructuresSettings.field_236191_b_);
         map.put(Structure.RUINED_PORTAL, new StructureSeparationSettings(25, 10, 34222645));
 
