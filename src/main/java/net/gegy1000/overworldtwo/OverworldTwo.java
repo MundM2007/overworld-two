@@ -4,10 +4,13 @@ package net.gegy1000.overworldtwo;
 
 import net.gegy1000.overworldtwo.generator.OverworldTwoChunkGenerator;
 import net.gegy1000.overworldtwo.generator.OverworldTwoGeneratorType;
+import net.gegy1000.overworldtwo.generator.modcompat.OverworldTwoBOPWorldType;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,14 +24,17 @@ public final class OverworldTwo {
 
     public OverworldTwo() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+        if(FMLEnvironment.dist == Dist.CLIENT) {
+            registerGenTypes();
+        }
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
         OverworldTwoChunkGenerator.register();
     }
 
-    private void clientSetup(FMLClientSetupEvent event) {
+    private void registerGenTypes() {
         OverworldTwoGeneratorType.register();
+        OverworldTwoBOPWorldType.register();
     }
 }

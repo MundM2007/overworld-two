@@ -6,7 +6,6 @@
   "refmap": "overworld_two.refmap.json",
   "mixins": [
     "MixinDimensionType",
-    "MixinGeneratorOptions",
     "MixinOreFeature",
     "MixinNoiseChunkGenerator"
   ],
