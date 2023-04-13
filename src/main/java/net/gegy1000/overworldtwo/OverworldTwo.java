@@ -6,6 +6,7 @@ import net.gegy1000.overworldtwo.generator.OverworldTwoChunkGenerator;
 import net.gegy1000.overworldtwo.generator.OverworldTwoGeneratorType;
 import net.gegy1000.overworldtwo.generator.modcompat.OverworldTwoBOPWorldType;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -35,6 +36,7 @@ public final class OverworldTwo {
 
     private void registerGenTypes() {
         OverworldTwoGeneratorType.register();
-        OverworldTwoBOPWorldType.register();
+        if(ModList.get().isLoaded("biomesoplenty"))
+            OverworldTwoBOPWorldType.register();
     }
 }
